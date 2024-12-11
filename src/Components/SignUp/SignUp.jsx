@@ -1,19 +1,28 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase.init";
 import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const SignUp = () => {
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignUp = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
+    const terms = e.target.terms.checked;
 
     // reset error and status
     setErrorMessage("");
     setSuccess(false);
+
+    if (!terms) {
+      setErrorMessage("Please accept our terms and conditions");
+      return;
+    }
 
     if (password.length < 6) {
       setErrorMessage("Password should be at least 6 characters");
@@ -60,17 +69,26 @@ const SignUp = () => {
             required
           />
         </div>
-        <div className="form-control">
+        <div className="form-control relative">
           <label className="label">
             <span className="label-text">Password</span>
           </label>
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
             placeholder="password"
             className="input input-bordered"
             required
           />
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              setShowPassword(!showPassword);
+            }}
+            className="btn btn-xs absolute right-2 top-12"
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
           <label className="label">
             <a href="#" className="label-text-alt link link-hover">
               Forgot password?
@@ -81,10 +99,25 @@ const SignUp = () => {
           <p className="text-left text-sm text-red-600">{errorMessage}</p>
         )}
         {success && <p className="text-green-500">Sign up is Successful.</p>}
+
+        <div className="form-control">
+          <label className="label justify-start gap-2 cursor-pointer">
+            <input type="checkbox" name="terms" className="checkbox" />
+            <span className="label-text hover:underline text-xs">
+              Accept Our Terms And Conditions
+            </span>
+          </label>
+        </div>
         <div className="form-control mt-6">
           <button className="btn btn-primary">Sign Up</button>
         </div>
       </form>
+      <p className="m-2">
+        Already have an account? Please{" "}
+        <Link className="underline" to="/login">
+          Login
+        </Link>
+      </p>
     </div>
   );
 };
